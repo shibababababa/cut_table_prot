@@ -5,7 +5,7 @@ import { Capture } from "./Capture";
 
 const baseStyle: DropzoneRootProps = {
   flex: 1,
-  display: "flex",
+  display: "flex flex",
   flexDirection: "column",
   alignItems: "center",
   padding: "20px",
@@ -17,6 +17,9 @@ const baseStyle: DropzoneRootProps = {
   color: "#bdbdbd",
   outline: "none",
   transition: "border .24s ease-in-out",
+  width: "40%",
+  height: 100,
+  margin: "0 auto"
 };
 
 // フォーカスが当たったときの枠の色
@@ -40,14 +43,13 @@ export function MyDropzone() {
     const reader = new FileReader();
     reader.onload = () => {
       const videoURL = reader.result as string;
-      setVideoURL(videoURL)  
+      setVideoURL(videoURL);
     };
-    reader.readAsDataURL(acceptedFiles[0])
+    reader.readAsDataURL(acceptedFiles[0]);
   }, []);
   const onDelete = () => {
-    setVideoURL(undefined)
-  }
-
+    setVideoURL(undefined);
+  };
 
   const {
     getRootProps,
@@ -80,14 +82,24 @@ export function MyDropzone() {
         <div {...getRootProps({ style })}>
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p>Drop the file here ...</p>
+            <>
+              <p>Drop the file here ...</p>
+              <em className="text-sm text-gray-500">
+                (Only .mp4 files are accepted)
+              </em>
+            </>
           ) : (
-            <p>Drag drop a file here, or click to select file</p>
+            <>
+              <p>Drag drop a file here, or click to select file</p>
+              <em className="text-sm text-gray-500">
+                (Only .mp4 files are accepted)
+              </em>
+            </>
           )}
         </div>
       ) : (
         <div>
-          <button onClick={onDelete}>動画削除</button>
+          <button onClick={onDelete}>動画変更</button>
           <Capture videoURL={videoURL}></Capture>
         </div>
       )}
