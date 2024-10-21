@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-dropzone": "^14.2.10",
+    "react-player": "^2.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",

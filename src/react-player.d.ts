@@ -1,7 +1,7 @@
 declare module "react-player" {
     import { ComponentType } from "react";
   
-    interface ReactPlayerProps {
+    export interface ReactPlayerProps {
       url: string;
       playing?: boolean;
       loop?: boolean;
@@ -17,7 +17,6 @@ declare module "react-player" {
     export default ReactPlayer;
   }
   
-// mp4以外であれば、*.mp4の拡張子の部分を変更ください
 declare module '*.mp4' {
     const src: string;
     export default src;
