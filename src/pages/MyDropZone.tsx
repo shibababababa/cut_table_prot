@@ -44,6 +44,11 @@ export function MyDropzone() {
     };
     reader.readAsDataURL(acceptedFiles[0])
   }, []);
+  const onDelete = () => {
+    setVideoURL(undefined)
+  }
+
+
   const {
     getRootProps,
     getInputProps,
@@ -81,7 +86,10 @@ export function MyDropzone() {
           )}
         </div>
       ) : (
-        <Capture videoURL={videoURL}></Capture>
+        <div>
+          <button onClick={onDelete}>動画削除</button>
+          <Capture videoURL={videoURL}></Capture>
+        </div>
       )}
     </>
   );
