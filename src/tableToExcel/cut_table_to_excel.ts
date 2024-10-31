@@ -57,7 +57,7 @@ const edit_Workbook = (
 
   const labels = ["image", "title", "narration", "startAt", "finishAt"];
   labels.forEach((label, index) => {
-    const rowIndex = index + 3;
+    const rowIndex = index + 2;
     const labelCell = worksheet.getCell(`A${rowIndex}`);
     labelCell.value = label;
     labelCell.alignment = { vertical: "middle", horizontal: "center" };
@@ -86,7 +86,7 @@ const edit_Workbook = (
     const rowHeight = imageHeight * PIXELS_TO_ROW_POINTS;
 
     worksheet.getColumn(cut_i + 2).width = colWidth;
-    worksheet.getRow(3).height = rowHeight;
+    worksheet.getRow(2).height = rowHeight;
 
     // 画像を貼る
     const imageId = workbook.addImage({
@@ -94,15 +94,15 @@ const edit_Workbook = (
       extension: "png",
     });
     worksheet.addImage(imageId, {
-      tl: { col: cut_i + 1, row: 2 },
+      tl: { col: cut_i + 1, row: 1 },
       ext: { width: imageWidth, height: imageHeight },
     });
 
     // 画像以外のフィールドを書き出す(getCellの入力はrow, columnの順)
-    worksheet.getCell(4, cut_i + 2).value = cut.title;
-    worksheet.getCell(5, cut_i + 2).value = cut.narration;
-    worksheet.getCell(6, cut_i + 2).value = cut.startAt;
-    worksheet.getCell(7, cut_i + 2).value = cut.finishAt;
+    worksheet.getCell(3, cut_i + 2).value = cut.title;
+    worksheet.getCell(4, cut_i + 2).value = cut.narration;
+    worksheet.getCell(5, cut_i + 2).value = cut.startAt;
+    worksheet.getCell(6, cut_i + 2).value = cut.finishAt;
   }
 
   return workbook;
