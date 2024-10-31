@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import ReactPlayer from "react-player";
 
+import { cut_table_to_excel } from "../tableToExcel/cut_table_to_excel";
+
 type Props = {
   videoURL: string;
 };
@@ -8,15 +10,23 @@ type Props = {
 type Cut = {
   image: string;
   startAt: number;
+  finishAt: number;
+  title: string;
+  narration: string;
+};
+
+export type CutTable = {
+  cutID: string;
+  cuts: Cut[];
 };
 
 export function Capture(props: Props) {
   const playerRef = useRef<ReactPlayer>(null);
-  const [screenshots, setScreenshots] = useState<Cut[]>([]);
+  const [cutTable, setCuttable] = useState<CutTable>({ cutID: "0", cuts: [] });
   const [validNumberOfScreenshots, setValidNumberOfScreenshots] = useState(8);
 
   const captureScreenshot = () => {
-    if (screenshots.length < validNumberOfScreenshots) {
+    if (cutTable.cuts.length < validNumberOfScreenshots) {
       const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement;
 
       if (player) {
@@ -30,25 +40,35 @@ export function Capture(props: Props) {
 
         const dataURL = canvas.toDataURL("image/png");
         const list = [
-          ...screenshots,
-          { image: dataURL, startAt: playerRef.current.getCurrentTime() },
+          ...cutTable.cuts,
+          {
+            image: dataURL,
+            startAt: playerRef.current.getCurrentTime(),
+            finishAt: 1,
+            title: "todo",
+            narration: "todo",
+          },
         ];
-        setScreenshots(
-          list.sort((ss1, ss2) => {
+        setCuttable({
+          cutID: cutTable.cutID,
+          cuts: list.sort((ss1, ss2) => {
             return ss1.startAt > ss2.startAt ? 1 : -1;
-          })
-        );
+          }),
+        });
       }
     } else {
-      alert("Too many screenshots!");
+      alert("Too many cutTable.cuts!");
     }
   };
 
   const onClickDelete = (startAt: number) => {
-    const newList = screenshots.filter((screenshot) => {
+    const newCuts = cutTable.cuts.filter((screenshot) => {
       return screenshot.startAt !== startAt;
     });
-    setScreenshots(newList);
+    setCuttable({
+      cutID: cutTable.cutID,
+      cuts: newCuts,
+    });
   };
 
   const getLengthOfColumn = () => {
@@ -60,7 +80,11 @@ export function Capture(props: Props) {
       case 6:
         return "grid-cols-6";
     }
-  }
+  };
+
+  const exportExcelFile = async () => {
+    await cut_table_to_excel(validNumberOfScreenshots, cutTable);
+  };
 
   const ScreenshotsHistory = () => {
     return (
@@ -70,7 +94,7 @@ export function Capture(props: Props) {
             Screenshot History
           </h2>
           <label>
-            Valid number of screenshots is:
+            Valid number of cutTable.cuts is:
             <select
               name="selectedFruit"
               className="ml-4"
@@ -79,14 +103,14 @@ export function Capture(props: Props) {
                 setValidNumberOfScreenshots(newValidNumberOfScreenshots);
               }}
             >
-              <option value="8" disabled={screenshots.length > 8}>
-                8枚カット
+              <option value="8" disabled={cutTable.cuts.length > 8}>
+                8 Cuts
               </option>
-              <option value="10" disabled={screenshots.length > 10}>
-                10枚カット
+              <option value="10" disabled={cutTable.cuts.length > 10}>
+                10 Cuts
               </option>
-              <option value="12" disabled={screenshots.length > 12}>
-                12枚カット
+              <option value="12" disabled={cutTable.cuts.length > 12}>
+                12 Cuts
               </option>
             </select>
           </label>
@@ -94,7 +118,7 @@ export function Capture(props: Props) {
         <div
           className={`grid ${getLengthOfColumn()} gap-6 overflow-x-auto py-4 border-t-2 border-gray-300`}
         >
-          {screenshots.map((screenshot, index) => (
+          {cutTable.cuts.map((screenshot, index) => (
             <div
               key={index}
               className="flex flex-col items-center p-4 bg-white rounded-lg shadow-md
@@ -149,6 +173,14 @@ export function Capture(props: Props) {
         Capture Screenshot
       </button>
       <ScreenshotsHistory></ScreenshotsHistory>
+      <div>
+        <button
+          onClick={exportExcelFile}
+          className="w-1/4 mx-auto my-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+        >
+          Export Excel File
+        </button>
+      </div>
     </div>
   );
 }
