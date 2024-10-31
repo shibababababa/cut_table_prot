@@ -13,7 +13,7 @@ type Cut = {
 export function Capture(props: Props) {
   const playerRef = useRef<ReactPlayer>(null);
   const [screenshots, setScreenshots] = useState<Cut[]>([]);
-  const [validNumberOfScreenshots, setValidNumberOfScreenshots] = useState(10);
+  const [validNumberOfScreenshots, setValidNumberOfScreenshots] = useState(8);
 
   const captureScreenshot = () => {
     if (screenshots.length < validNumberOfScreenshots) {
@@ -51,25 +51,19 @@ export function Capture(props: Props) {
     setScreenshots(newList);
   };
 
-  return (
-    <div className="flex flex-col gap-8 p-6 bg-gray-50 rounded-lg shadow-xl max-w-6xl mx-auto">
-      <ReactPlayer
-        ref={playerRef}
-        url={props.videoURL}
-        playing
-        controls
-        className="rounded-lg shadow-lg overflow-hidden"
-        width="100%"
-        height="100%"
-      />
-      <button
-        onClick={captureScreenshot}
-        className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md 
-               hover:bg-blue-600 transition-all duration-300 ease-in-out"
-      >
-        Capture Screenshot
-      </button>
+  const getLengthOfColumn = () => {
+    switch (validNumberOfScreenshots / 2) {
+      case 4:
+        return "grid-cols-4";
+      case 5:
+        return "grid-cols-5";
+      case 6:
+        return "grid-cols-6";
+    }
+  }
 
+  const ScreenshotsHistory = () => {
+    return (
       <div className="w-full mt-6">
         <div className="flex justify-between">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -97,12 +91,14 @@ export function Capture(props: Props) {
             </select>
           </label>
         </div>
-        <div className="flex flex-wrap gap-6 overflow-x-auto py-4 border-t-2 border-gray-300">
+        <div
+          className={`grid ${getLengthOfColumn()} gap-6 overflow-x-auto py-4 border-t-2 border-gray-300`}
+        >
           {screenshots.map((screenshot, index) => (
             <div
               key={index}
-              className="flex flex-col items-center w-48 p-4 bg-white rounded-lg shadow-md
-                     hover:shadow-lg transition-all duration-300 ease-in-out"
+              className="flex flex-col items-center p-4 bg-white rounded-lg shadow-md
+             hover:shadow-lg transition-all duration-300 ease-in-out"
             >
               <p className="text-sm text-gray-600 mb-2">
                 Captured at: {screenshot.startAt.toFixed(5)}s
@@ -116,14 +112,14 @@ export function Capture(props: Props) {
                 href={screenshot.image}
                 download={`screenshot-${index + 1}.png`}
                 className="w-full text-center px-4 py-2 my-2 bg-green-500 text-white rounded-md 
-                       hover:bg-green-600 transition-all duration-300"
+               hover:bg-green-600 transition-all duration-300"
               >
                 Download Screenshot
               </a>
               <button
                 onClick={() => onClickDelete(screenshot.startAt)}
                 className="w-full text-center px-4 py-2 my-2 bg-red-500 text-white rounded-md 
-                       hover:bg-red-600 transition-all duration-300"
+               hover:bg-red-600 transition-all duration-300"
               >
                 Delete Screenshot
               </button>
@@ -131,6 +127,28 @@ export function Capture(props: Props) {
           ))}
         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-8 p-6 bg-gray-50 rounded-lg shadow-xl max-w-6xl mx-auto">
+      <ReactPlayer
+        ref={playerRef}
+        url={props.videoURL}
+        playing
+        controls
+        className="rounded-lg shadow-lg overflow-hidden"
+        width="100%"
+        height="100%"
+      />
+      <button
+        onClick={captureScreenshot}
+        className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md 
+               hover:bg-blue-600 transition-all duration-300 ease-in-out"
+      >
+        Capture Screenshot
+      </button>
+      <ScreenshotsHistory></ScreenshotsHistory>
     </div>
   );
 }
