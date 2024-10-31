@@ -19,7 +19,7 @@ const baseStyle: DropzoneRootProps = {
   transition: "border .24s ease-in-out",
   width: "40%",
   height: 100,
-  margin: "0 auto"
+  margin: "0 auto",
 };
 
 // フォーカスが当たったときの枠の色
@@ -98,8 +98,15 @@ export function MyDropzone() {
           )}
         </div>
       ) : (
-        <div>
-          <button onClick={onDelete}>動画変更</button>
+        <div className="">
+          <div className="w-full flex justify-center">
+            <button
+              onClick={onDelete}
+              className="w-1/4 mx-auto my-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+            >
+              動画変更
+            </button>
+          </div>
           <Capture videoURL={videoURL}></Capture>
         </div>
       )}
