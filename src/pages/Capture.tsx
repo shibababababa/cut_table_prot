@@ -13,29 +13,34 @@ type Cut = {
 export function Capture(props: Props) {
   const playerRef = useRef<ReactPlayer>(null);
   const [screenshots, setScreenshots] = useState<Cut[]>([]);
+  const [validNumberOfScreenshots, setValidNumberOfScreenshots] = useState(10);
 
   const captureScreenshot = () => {
-    const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement;
+    if (screenshots.length < validNumberOfScreenshots) {
+      const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement;
 
-    if (player) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+      if (player) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
 
-      canvas.width = player.videoWidth / 4;
-      canvas.height = player.videoHeight / 4;
+        canvas.width = player.videoWidth / 4;
+        canvas.height = player.videoHeight / 4;
 
-      ctx?.drawImage(player, 0, 0, canvas.width, canvas.height);
+        ctx?.drawImage(player, 0, 0, canvas.width, canvas.height);
 
-      const dataURL = canvas.toDataURL("image/png");
-      const list = [
-        ...screenshots,
-        { image: dataURL, startAt: playerRef.current.getCurrentTime() },
-      ];
-      setScreenshots(
-        list.sort((ss1, ss2) => {
-          return ss1.startAt > ss2.startAt ? 1 : -1;
-        })
-      );
+        const dataURL = canvas.toDataURL("image/png");
+        const list = [
+          ...screenshots,
+          { image: dataURL, startAt: playerRef.current.getCurrentTime() },
+        ];
+        setScreenshots(
+          list.sort((ss1, ss2) => {
+            return ss1.startAt > ss2.startAt ? 1 : -1;
+          })
+        );
+      }
+    } else {
+      alert("Too many screenshots!");
     }
   };
 
@@ -66,10 +71,32 @@ export function Capture(props: Props) {
       </button>
 
       <div className="w-full mt-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Screenshot History
-        </h2>
-
+        <div className="flex justify-between">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Screenshot History
+          </h2>
+          <label>
+            Valid number of screenshots is:
+            <select
+              name="selectedFruit"
+              className="ml-4"
+              onChange={(e) => {
+                const newValidNumberOfScreenshots = Number(e.target.value);
+                setValidNumberOfScreenshots(newValidNumberOfScreenshots);
+              }}
+            >
+              <option value="8" disabled={screenshots.length > 8}>
+                8枚カット
+              </option>
+              <option value="10" disabled={screenshots.length > 10}>
+                10枚カット
+              </option>
+              <option value="12" disabled={screenshots.length > 12}>
+                12枚カット
+              </option>
+            </select>
+          </label>
+        </div>
         <div className="flex flex-wrap gap-6 overflow-x-auto py-4 border-t-2 border-gray-300">
           {screenshots.map((screenshot, index) => (
             <div
