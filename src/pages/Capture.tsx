@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import ReactPlayer from "react-player";
+import { v4 as uuidv4 } from 'uuid';
 
 import { cut_table_to_excel } from "../tableToExcel/cut_table_to_excel";
 
@@ -18,6 +19,34 @@ type Cut = {
 export type CutTable = {
   cutID: string;
   cuts: Cut[];
+};
+
+const TitleInput = ({ cut, index, handleOnChange }: { cut: Cut; index: number; handleOnChange: (event: React.ChangeEvent<HTMLInputElement>, index: number) => void }) => {
+  return (
+    <input
+      type="text"
+      className="px-4 py-2 my-2 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out text-gray-700"
+      placeholder="Enter title here..."
+      value={cut.title || ""}
+      onChange={(e) => {
+        handleOnChange(e, index);
+      }}
+    />
+  );
+};
+
+const NarrationInput = ({ cut, index, handleOnChange }: { cut: Cut; index: number; handleOnChange: (event: React.ChangeEvent<HTMLInputElement>, index: number) => void }) => {
+  return (
+    <input
+      type="text"
+      className="px-4 py-2 my-2 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out text-gray-700"
+      placeholder="Enter narration here..."
+      value={cut.narration || ""}
+      onChange={(e) => {
+        handleOnChange(e, index);
+      }}
+    />
+  );
 };
 
 export function Capture(props: Props) {
@@ -45,8 +74,8 @@ export function Capture(props: Props) {
             image: dataURL,
             startAt: playerRef.current.getCurrentTime(),
             finishAt: 1,
-            title: "todo",
-            narration: "todo",
+            title: "",
+            narration: "",
           },
         ];
         setCuttable({
@@ -71,14 +100,36 @@ export function Capture(props: Props) {
     });
   };
 
+  const handleOnChangeTitle = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const updatedTitle = event.target.value;
+    const updatedCuts = cutTable.cuts.map((cut, i) =>
+      i === index ? { ...cut, title: updatedTitle } : cut
+    );
+    setCuttable({ ...cutTable, cuts: updatedCuts });
+  };
+
+  const handleOnChangeNarration = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const updatedNarration = event.target.value;
+    const updatedCuts = cutTable.cuts.map((cut, i) =>
+      i === index ? { ...cut, narration: updatedNarration } : cut
+    );
+    setCuttable({ ...cutTable, cuts: updatedCuts });
+  };
+
   const getLengthOfColumn = () => {
     switch (validNumberOfScreenshots / 2) {
       case 4:
-        return "grid-cols-4";
+        return "grid-cols-2";
       case 5:
-        return "grid-cols-5";
+        return "grid-cols-2";
       case 6:
-        return "grid-cols-6";
+        return "grid-cols-2";
     }
   };
 
@@ -96,7 +147,7 @@ export function Capture(props: Props) {
           <label>
             Valid number of cutTable.cuts is:
             <select
-              name="selectedFruit"
+              name="number of cuts"
               className="ml-4"
               onChange={(e) => {
                 const newValidNumberOfScreenshots = Number(e.target.value);
@@ -118,22 +169,24 @@ export function Capture(props: Props) {
         <div
           className={`grid ${getLengthOfColumn()} gap-6 overflow-x-auto py-4 border-t-2 border-gray-300`}
         >
-          {cutTable.cuts.map((screenshot, index) => (
+          {cutTable.cuts.map((cut, index) => (
             <div
-              key={index}
+              key={uuidv4()}
               className="flex flex-col items-center p-4 bg-white rounded-lg shadow-md
              hover:shadow-lg transition-all duration-300 ease-in-out"
             >
               <p className="text-sm text-gray-600 mb-2">
-                Captured at: {screenshot.startAt.toFixed(5)}s
+                Captured at: {cut.startAt.toFixed(5)}s
               </p>
               <img
-                src={screenshot.image}
+                src={cut.image}
                 alt={`Screenshot ${index + 1}`}
                 className="w-full h-auto rounded-lg mb-4"
               />
+              <TitleInput cut={cut} index={index} handleOnChange={handleOnChangeTitle}></TitleInput>
+              <NarrationInput cut={cut} index={index} handleOnChange={handleOnChangeNarration}></NarrationInput>
               <a
-                href={screenshot.image}
+                href={cut.image}
                 download={`screenshot-${index + 1}.png`}
                 className="w-full text-center px-4 py-2 my-2 bg-green-500 text-white rounded-md 
                hover:bg-green-600 transition-all duration-300"
@@ -141,7 +194,7 @@ export function Capture(props: Props) {
                 Download Screenshot
               </a>
               <button
-                onClick={() => onClickDelete(screenshot.startAt)}
+                onClick={() => onClickDelete(cut.startAt)}
                 className="w-full text-center px-4 py-2 my-2 bg-red-500 text-white rounded-md 
                hover:bg-red-600 transition-all duration-300"
               >
